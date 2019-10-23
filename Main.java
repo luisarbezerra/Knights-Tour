@@ -2,158 +2,155 @@ import java.util.Random;
 
 public class Main {
 
-    public static int visitadas;
+    public static int visited;
 
-    public static int[][] criaMatriz(){
+    public static int[][] createMatrix(){
 
-        int i, j;
-        int matriz[][] = new int[8][8];
+        int matrix[][] = new int[8][8];
 
-        for (i = 0; i < 8; i++){
-            for (j = 0; j < 8; j++){
-                matriz[i][j] = 0;
+        for (int row = 0; row < 8; row++){
+            for (int column = 0; column < 8; column++){
+                matrix[row][column] = 0;
             }
         }
 
-        return matriz;
+        return matrix;
 
     }
 
 
-    public static int[][] clonaMatriz(int matriz[][]){
+    public static int[][] cloneMatrix(int matrix[][]){
 
         int i, j;
-        int matrizClone[][] = new int[8][8];
+        int matrixCloned[][] = new int[8][8];
 
         for (i = 0; i < 8; i++){
             for (j = 0; j < 8; j++){
-                matrizClone[i][j] = matriz[i][j];
+                matrixCloned[i][j] = matrix[i][j];
             }
         }
 
-        return matrizClone;
+        return matrixCloned;
 
     }
 
-    public static int numeroRandom (){
+    public static int randNum(){
 
-        int coordenada;
+        int coord;
+        int SEED = 8;
+        Random generator = new Random();
+        coord = generator.nextInt(SEED);
 
-        Random gerador = new Random();
-        coordenada = gerador.nextInt(8);
-
-        return coordenada;
+        return coord;
 
     }
 
-    public static void imprimeMatriz (int matriz[][]) {
+    public static void printMatrix(int matrix[][]) {
 
-        int i, j;
-
-        for (i = 0; i < 8; i++){
-            for (j = 0; j < 8; j++){
-                System.out.print(matriz[i][j] + " /");
+        for (int row = 0; row < 8; row++){
+            for (int column = 0; column < 8; column++){
+                System.out.print(matrix[row][column] + " /");
             }
             System.out.println();
         }
 
     }
 
-    public static void marcaTabuleiro(int x, int y, int turno, int[][] matriz) {
+    public static void markBoard(int x, int y, int turn, int[][] matrix) {
 
-        matriz[x][y] = turno;
-        visitadas ++;
-
-    }
-
-    public static boolean checaCasaNaoVisitada(int x, int y, int[][]matriz) {
-
-        return matriz[x][y] == 0; //em caso de 0 (casa não visitada), retorna true, ou seja, vazia.
+        matrix[x][y] = turn;
+        visited++;
 
     }
 
+    public static boolean checkNotVisited(int x, int y, int[][]matrix) {
 
-    public static boolean checaCasaDentroTabueiro(int x, int y, int[][]matriz) {
-
-        return x < 8 && x >= 0 && y < 8 && y >= 0; //em caso de a casa estar com coordenadas dentro do tabuleiro, retorna true.
+        return matrix[x][y] == 0;
 
     }
 
-    public static boolean visitouTodas (int[][] matriz) {
 
-        boolean visitou = true;
+    public static boolean checkBoard(int x, int y, int[][]matrix) {
 
-        for (int i = 0; i < 8 && visitou == true ; i++){
-            for (int j = 0; j < 8 && visitou == true; j++){
-                if (matriz[i][j] == 0) {
-                    visitou = false;
+        return x < 8 && x >= 0 && y < 8 && y >= 0;
+
+    }
+
+    public static boolean visitedAll(int[][] matrix) {
+
+        boolean visited = true;
+
+        for (int i = 0; i < 8 && visited == true ; i++){
+            for (int j = 0; j < 8 && visited == true; j++){
+                if (matrix[i][j] == 0) {
+                    visited = false;
                 }
             }
         }
 
-        return visitou;
+        return visited;
 
     }
 
-    public static void turnoDeJogo (int x, int y, int[][]matriz, int turno, long tempoInicial){
+    public static void gameTurn(int x, int y, int[][]matriz, int turn, long inicialTime){
 
-        int matrizClone[][] = clonaMatriz(matriz);
-        marcaTabuleiro(x, y, turno, matrizClone);
+        int matrixClone[][] = cloneMatrix(matriz);
+        markBoard(x, y, turn, matrixClone);
 
-        if (visitouTodas(matrizClone)){
-            System.out.println("Visitou Todas! :)");
-            System.out.println("Numero total de casas visitadas:  " + turno );
-            imprimeMatriz(matrizClone);
+        if (visitedAll(matrixClone)){
+            System.out.println("Visited everything! :)");
+            System.out.println("Total visited:  " + turn );
+            printMatrix(matrixClone);
 
-            long tempoFinal = System.currentTimeMillis();
-            System.out.println( (tempoFinal - tempoInicial) + " milisegundos" );
+            long finalTime = System.currentTimeMillis();
+            System.out.println( (finalTime - inicialTime) + " milisecs" );
             System.exit(0);
         }
 
-        turno++;
+        turn++;
 
-        if (checaCasaDentroTabueiro(x+2, y+1, matrizClone) && checaCasaNaoVisitada(x+2, y+1, matrizClone)){
-            turnoDeJogo (x+2, y+1, matrizClone, turno, tempoInicial);
+        if (checkBoard(x+2, y+1, matrixClone) && checkNotVisited(x+2, y+1, matrixClone)){
+            gameTurn(x+2, y+1, matrixClone, turn, inicialTime);
         }
 
-        if (checaCasaDentroTabueiro(x+1, y+2, matrizClone) && checaCasaNaoVisitada(x+1, y+2, matrizClone)){
-            turnoDeJogo (x+1, y+2, matrizClone, turno, tempoInicial);
+        if (checkBoard(x+1, y+2, matrixClone) && checkNotVisited(x+1, y+2, matrixClone)){
+            gameTurn(x+1, y+2, matrixClone, turn, inicialTime);
         }
 
-        if (checaCasaDentroTabueiro(x-1, y+2, matrizClone) && checaCasaNaoVisitada(x-1, y+2, matrizClone)){
-            turnoDeJogo (x-1, y+2, matrizClone, turno, tempoInicial);
+        if (checkBoard(x-1, y+2, matrixClone) && checkNotVisited(x-1, y+2, matrixClone)){
+            gameTurn(x-1, y+2, matrixClone, turn, inicialTime);
         }
 
-        if (checaCasaDentroTabueiro(x-2, y+1, matrizClone) && checaCasaNaoVisitada(x-2, y+1, matrizClone)){
-            turnoDeJogo (x-2, y+1, matrizClone, turno, tempoInicial);
+        if (checkBoard(x-2, y+1, matrixClone) && checkNotVisited(x-2, y+1, matrixClone)){
+            gameTurn(x-2, y+1, matrixClone, turn, inicialTime);
         }
 
-        if (checaCasaDentroTabueiro(x-2, y-1, matrizClone) && checaCasaNaoVisitada(x-2, y-1, matrizClone)){
-            turnoDeJogo (x-2, y-1, matrizClone, turno, tempoInicial);
+        if (checkBoard(x-2, y-1, matrixClone) && checkNotVisited(x-2, y-1, matrixClone)){
+            gameTurn(x-2, y-1, matrixClone, turn, inicialTime);
         }
 
-        if (checaCasaDentroTabueiro(x-1, y-2, matrizClone) && checaCasaNaoVisitada(x-1, y-2, matrizClone)){
-            turnoDeJogo (x-1, y-2, matrizClone, turno, tempoInicial);
+        if (checkBoard(x-1, y-2, matrixClone) && checkNotVisited(x-1, y-2, matrixClone)){
+            gameTurn(x-1, y-2, matrixClone, turn, inicialTime);
         }
 
-        if (checaCasaDentroTabueiro(x+1, y-2, matrizClone) && checaCasaNaoVisitada(x+1, y-2, matrizClone)){
-            turnoDeJogo (x+1, y-2, matrizClone, turno, tempoInicial);
+        if (checkBoard(x+1, y-2, matrixClone) && checkNotVisited(x+1, y-2, matrixClone)){
+            gameTurn(x+1, y-2, matrixClone, turn, inicialTime);
         }
 
-        if (checaCasaDentroTabueiro(x+2, y-1, matrizClone) && checaCasaNaoVisitada(x+2, y-1, matrizClone)){
-            turnoDeJogo (x+2, y-1, matrizClone, turno, tempoInicial);
+        if (checkBoard(x+2, y-1, matrixClone) && checkNotVisited(x+2, y-1, matrixClone)){
+            gameTurn(x+2, y-1, matrixClone, turn, inicialTime);
         }
     }
 
     public static void main(String[] args) {
 
-        visitadas = 0;
-        int matriz[][] = criaMatriz();
-        int x = numeroRandom(), y = numeroRandom();
+        visited = 0;
+        int matriz[][] = createMatrix();
+        int x = randNum(), y = randNum();
 
-        long tempoInicial = System.currentTimeMillis();
+        long startTime = System.currentTimeMillis();
 
-        turnoDeJogo(x, y, matriz, 1, tempoInicial); //primeiro turno = 1
+        gameTurn(x, y, matriz, 1, startTime);
 
     }
 
